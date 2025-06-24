@@ -1,11 +1,19 @@
 import sqlite3
 import os
 import random
+import re
 
 RANK_POINTS = [25,20,18,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,1,1,1,1,1,1,1,1,1,1,1]
 pilots_results = {}
 IN_FOLDER = "in_databases"
 PRINT_HEAT_RESULTS = True
+
+def sorted_nicely(l):
+    """ Sort the given iterable in the way that humans expect."""
+    convert = lambda text: int(text) if text.isdigit() else text
+    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+    return sorted(l, key = alphanum_key)
+
 
 class Pilot:
     def __init__(self, nick):
@@ -231,7 +239,14 @@ if __name__ == '__main__':
 
     # Read all db and fill pilots structure
     # TODO: Finish filling pilot class
-    for database_file in os.listdir(IN_FOLDER):
+    pattern = re.compile(r'.*\.db')
+    for database_file in sorted_nicely(os.listdir(IN_FOLDER)):
+        # Skip files that do not match the .db pattern
+        if not pattern.match(database_file):
+            print("Skipping "+database_file)
+            continue
+
+        # Connect DB
         databse_file_path = os.path.realpath(os.path.join(IN_FOLDER, database_file))
         print(databse_file_path)
         conn = sqlite3.connect(databse_file_path)
