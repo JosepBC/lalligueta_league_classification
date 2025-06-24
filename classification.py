@@ -203,7 +203,7 @@ def compute_number_of_laps(conn: sqlite3.Connection):
         # Get callsign of pilot
         c.execute('SELECT callsign FROM pilot WHERE id=?', (pilot_id,))
         pilot_nick = c.fetchone()[0]
-        pilots_results[pilot_nick].completed_laps = number_of_laps
+        pilots_results[pilot_nick].completed_laps += number_of_laps
         print(f"Pilot ID: {pilot_id}, Pilot Nick: {pilot_nick}, Total Laps: {number_of_laps}")
     print("Number of laps end")
 
