@@ -71,9 +71,9 @@ def msec_to_min_sec_dec(ms):
     sec = ms/1000.0
 
     min = int(sec // 60)
-    sec_restantes = sec % 60
+    sec_remaining = sec % 60
 
-    return f"{min}:{sec_restantes:06.3f}"
+    return f"{min}:{sec_remaining:06.3f}"
 
 
 def get_fastest_X_consecutive(cursor: sqlite3.Cursor, race_id, n_consecutive_laps=3):
