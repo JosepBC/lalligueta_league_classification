@@ -2,10 +2,12 @@ import sqlite3
 import os
 import random
 import re
+import csv
 
 RANK_POINTS = [25,20,18,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,1,1,1,1,1,1,1,1,1,1,1]
 pilots_results = {}
 IN_FOLDER = "in_databases"
+OUT_FOLDER = "out_data"
 PRINT_HEAT_RESULTS = True
 
 def sorted_nicely(l):
@@ -391,6 +393,17 @@ if __name__ == '__main__':
     # p.nick  # Final alphabetical tiebreaker?
     ))
 
+
+    classification_csv_file = os.path.realpath(os.path.join(OUT_FOLDER, "classification.csv"))
+    with open(classification_csv_file, mode="w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["nick", "points", "won races", "consecutive 3 fastest laps", "position accomulator", "completed laps", "fastest race", "fastest laps", "coin flip"])
+        pilot_object: Pilot
+        for pilot_object in pilots_list:
+            writer.writerow([pilot_object.nick, pilot_object.points, pilot_object.won_races, pilot_object.consecutives_3_fastest_laps, pilot_object.race_position_accomulator, pilot_object.completed_laps, pilot_object.fastest_race, pilot_object.fastest_laps, pilot_object.coin_flip])
+            print(pilot_object.nick+" points = "+str(pilot_object.points)+", won races = "+str(pilot_object.won_races)+", consecutive 3 fastest laps = "+str(pilot_object.consecutives_3_fastest_laps)+", position accomulator = "+str(pilot_object.race_position_accomulator)+", completed laps = "+str(pilot_object.completed_laps)+", fastest race = "+str(pilot_object.fastest_race)+", fastest laps = "+str(pilot_object.fastest_laps)+", coin flip = "+str(pilot_object.coin_flip))
+
+    print("-------------------------")
     pilot_object: Pilot
     for pilot_object in pilots_list:
         print(pilot_object.nick+" points = "+str(pilot_object.points)+", won races = "+str(pilot_object.won_races)+", consecutive 3 fastest laps = "+str(pilot_object.consecutives_3_fastest_laps)+", position accomulator = "+str(pilot_object.race_position_accomulator)+", completed laps = "+str(pilot_object.completed_laps)+", fastest race = "+str(pilot_object.fastest_race)+", fastest laps = "+str(pilot_object.fastest_laps)+", coin flip = "+str(pilot_object.coin_flip))
