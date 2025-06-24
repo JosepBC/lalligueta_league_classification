@@ -268,7 +268,7 @@ if __name__ == '__main__':
 
     pilot_object: Pilot
     for pilot_nick, pilot_object in sorted_pilot_points.items():
-        print(pilot_nick+" points = "+str(pilot_object.points)+", won races = "+str(pilot_object.won_races)+", consecutive 3 fastest laps = "+str(pilot_object.consecutives_3_fastest_laps)+", position accomulator = "+str(pilot_object.race_position_accomulator)+", completed laps = "+str(pilot_object.completed_laps)+", fastest race = "+str(pilot_object.fastest_race)+", fastest laps = "+str(pilot_object.fastest_laps))
+        print(pilot_nick+" points = "+str(pilot_object.points)+", won races = "+str(pilot_object.won_races)+", consecutive 3 fastest laps = "+str(pilot_object.consecutives_3_fastest_laps)+", position accomulator = "+str(pilot_object.race_position_accomulator)+", completed laps = "+str(pilot_object.completed_laps)+", fastest race = "+str(pilot_object.fastest_race)+", fastest laps = "+str(pilot_object.fastest_laps)+", coin flip:"+str(pilot_object.coin_flip))
 
 
     print("-------------------------")
@@ -284,7 +284,8 @@ if __name__ == '__main__':
     -p.fastest_laps, # More fastest laps is better
     p.coin_flip # Fallback coinflip
     # p.nick  # Final alphabetical tiebreaker?
-))
+    ))
+
     pilot_object: Pilot
     for pilot_object in pilots_list:
-        print(pilot_object.nick+" points = "+str(pilot_object.points)+", won races = "+str(pilot_object.won_races)+", consecutive 3 fastest laps = "+str(pilot_object.consecutives_3_fastest_laps)+", position accomulator = "+str(pilot_object.race_position_accomulator)+", completed laps = "+str(pilot_object.completed_laps)+", fastest race = "+str(pilot_object.fastest_race)+", fastest laps = "+str(pilot_object.fastest_laps))
+        print(pilot_object.nick+" points = "+str(pilot_object.points)+", won races = "+str(pilot_object.won_races)+", consecutive 3 fastest laps = "+str(pilot_object.consecutives_3_fastest_laps)+", position accomulator = "+str(pilot_object.race_position_accomulator)+", completed laps = "+str(pilot_object.completed_laps)+", fastest race = "+str(pilot_object.fastest_race)+", fastest laps = "+str(pilot_object.fastest_laps)+", coin flip = "+str(pilot_object.coin_flip))
