@@ -406,4 +406,4 @@ if __name__ == '__main__':
     print("-------------------------")
     pilot_object: Pilot
     for pilot_object in pilots_list:
-        print(pilot_object.nick+" points = "+str(pilot_object.points)+", won races = "+str(pilot_object.won_races)+", consecutive 3 fastest laps = "+str(pilot_object.consecutives_3_fastest_laps)+", position accomulator = "+str(pilot_object.race_position_accomulator)+", completed laps = "+str(pilot_object.completed_laps)+", fastest race = "+str(pilot_object.fastest_race)+", fastest laps = "+str(pilot_object.fastest_laps)+", coin flip = "+str(pilot_object.coin_flip))
+        print(pilot_object.nick+" = "+str(pilot_object.points)+" points")
