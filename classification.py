@@ -62,6 +62,70 @@ def get_sorted_heat_results(cursor: sqlite3.Cursor, race_id, heat_id):
         'pilots': pilot_results
     }
 
+def msec_to_min_sec_dec(ms):
+    if ms is None:
+        return f"None"
+
+    sec = ms/1000.0
+
+    min = int(sec // 60)
+    sec_restantes = sec % 60
+
+    return f"{min}:{sec_restantes:06.3f}"
+
+
+def get_fastest_X_consecutive(cursor: sqlite3.Cursor, race_id, n_consecutive_laps=3):
+    # Obtain pilots in that race
+    cursor.execute('SELECT pilot_id FROM saved_pilot_race WHERE race_id = ?', (race_id,))
+    pilots = cursor.fetchall()
+
+    pilot_results = {}
+
+    # For each pilot in the race
+    for (pilot_id,) in pilots:
+        cursor.execute('SELECT callsign, name FROM pilot WHERE id=?', (pilot_id,))
+        pilot_nick, pilot_name = cursor.fetchone()
+
+        # Initialize result
+        pilot_results[pilot_nick] = None
+
+        # Get laptimes
+        cursor.execute(
+            'SELECT lap_time FROM saved_race_lap WHERE race_id = ? AND pilot_id = ? AND deleted = 0',
+            (race_id, pilot_id)
+        )
+
+        laps = cursor.fetchall()
+
+        # Convert to list of floats
+        laptimes = [t[0] for t in laps]
+
+        # At least it must have 2 laps to start counting consecutive lap times
+        if len(laptimes) < 2:
+            continue
+
+        # Add first pass to start/finish line to first lap
+        #laptimes = [laptimes[0]+laptimes[1]] + laptimes[2:]
+
+        # Rotorhazard does not take into account first pass on start/finish line, do the same for now
+        laptimes = laptimes[1:]
+
+        if len(laptimes) < n_consecutive_laps:
+            continue
+
+        # Initialzie best time to infinite
+        best_time = float("inf")
+
+        for i in range(len(laptimes) - n_consecutive_laps + 1):
+            accomulated_laptime = sum(laptimes[i:i + n_consecutive_laps])
+            if accomulated_laptime < best_time:
+                best_time = accomulated_laptime
+
+        pilot_results[pilot_nick] = best_time
+
+    return pilot_results
+
+
 def compute_race_points(conn: sqlite3.Connection):
     # Connect to the database
     c = conn.cursor()
@@ -226,6 +290,47 @@ def compute_fastest_race(conn: sqlite3.Connection):
     #     #print(f"Pilot ID: {pilot_id}, Pilot Nick: {pilot_nick}, Formatted lap time: {lap_time_formatted}, Race ID: {race_id}, Fastest lap: {lap_time}, Lap Time Stamp {lap_time_stamp}")
     # print("End lap time")
 
+def compute_fastest_3_consecutive_laps(conn: sqlite3.Connection):
+    # Connect to the database
+    c = conn.cursor()
+
+    pilot_best_laptimes = {}
+
+    # Get race class
+    c.execute('SELECT id, name FROM race_class')
+    for raceclass_id, raceclass_name in c.fetchall():
+        # Get all heat ids from current race class
+        c.execute('SELECT heat_id FROM saved_race_meta WHERE class_id=? ORDER BY heat_id DESC', (raceclass_id, ))
+
+        # For every heat in current raceclass
+        for heat_id in c.fetchall():
+            current_heat_id = heat_id[0]
+
+            # Get the race id for that heat
+            c.execute('SELECT id FROM saved_race_meta WHERE heat_id=?', (current_heat_id, ))
+            race_id = c.fetchall()[0][0]
+
+            # Get times of all pilots in that heat
+            laptime_pilot = get_fastest_X_consecutive(c, race_id, n_consecutive_laps=3)
+            for pilot_nick, best_3_consecutive_laptime in laptime_pilot.items():
+                # If the computed time is not none and
+                # pilot is not in the list of times or the time is faster than the one we have registred, update
+                if best_3_consecutive_laptime is not None and (pilot_nick not in pilot_best_laptimes or pilot_best_laptimes[pilot_nick] > best_3_consecutive_laptime):
+                    pilot_best_laptimes[pilot_nick] = best_3_consecutive_laptime
+
+    # Sort from lower to higher times
+    sorted_times = dict(sorted(pilot_best_laptimes.items(), key=lambda item: item[1]))
+
+    # Get lower time
+    fastest_3_laps_pilot = list(sorted_times.keys())[0]
+    fastest_3_laps_time = pilot_best_laptimes[fastest_3_laps_pilot]
+
+    # Increase the number of consecutives 3 fastest laps of that pilot
+    pilots_results[fastest_3_laps_pilot].consecutives_3_fastest_laps += 1
+
+    print(f"Fastest 3 consecutive laps {fastest_3_laps_pilot} = {msec_to_min_sec_dec(fastest_3_laps_time)}")
+
+
 if __name__ == '__main__':
     # Fill pilot points with 2025 pilots
     with open("pilots.txt", "r") as f:
@@ -238,7 +343,6 @@ if __name__ == '__main__':
     print("-------------------------")
 
     # Read all db and fill pilots structure
-    # TODO: Finish filling pilot class
     pattern = re.compile(r'.*\.db')
     for database_file in sorted_nicely(os.listdir(IN_FOLDER)):
         # Skip files that do not match the .db pattern
@@ -258,6 +362,7 @@ if __name__ == '__main__':
         compute_number_of_laps(conn)
         compute_fastest_lap(conn)
         compute_fastest_race(conn)
+        compute_fastest_3_consecutive_laps(conn)
         conn.close()
 
 
