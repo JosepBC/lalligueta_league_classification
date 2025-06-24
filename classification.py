@@ -29,7 +29,7 @@ class Pilot:
         self.fastest_laps = 0 # Number of fastest laps throught the league
         self.coin_flip = random.random() # If after all is still a tie, coin flip
 
-def get_sorted_heat_results(cursor:sqlite3.Cursor, race_id, heat_id):
+def get_sorted_heat_results(cursor: sqlite3.Cursor, race_id, heat_id):
     # Obtain pilots in that race
     cursor.execute('SELECT pilot_id FROM saved_pilot_race WHERE race_id = ?', (race_id,))
     pilots = cursor.fetchall()
