@@ -26,7 +26,7 @@ class Pilot:
         self.won_races = 0 # Number of won races of this pilot
         self.consecutives_3_fastest_laps = 0 # Number of 3 fastest consecutive laps in a race
         self.race_position_accomulator = 0 # Accomulator adding position of each race
-        self.completed_laps = 0 # Total number of completed laps # I think it's a count on saved_race_lap where deleted = 0 and substract 1 for the first pass
+        self.completed_laps = 0 # Total number of completed laps
         self.fastest_race = 0 # Number of times this pilot has had the fastest overall race (needs to complete all laps)
         self.fastest_laps = 0 # Number of fastest laps throught the league
         self.coin_flip = random.random() # If after all is still a tie, coin flip
